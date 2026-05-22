@@ -8,12 +8,26 @@ It runs silently in the system tray and is controlled entirely by hotkeys.
 
 ---
 
-## Hotkeys
+## How it works — two modes
 
-| Key                     | What happens |
-|-------------------------|--------------|
-| Right Alt               | Start recording → press again to stop → text is copied to clipboard |
-| Right Alt + Right Shift | Start recording → press again to stop → text is appended to today's notes file |
+**Clipboard mode** (Right Alt):
+1. Press Right Alt — a small overlay appears at the bottom of the screen, recording starts
+2. Speak
+3. Press Right Alt again — recording stops, speech is transcribed
+4. The resulting text is **copied to your clipboard** — paste it anywhere with Ctrl+V
+
+**Notes mode** (Right Alt + Right Shift):
+1. Hold Right Shift, then press Right Alt — overlay appears in light theme, recording starts
+2. Speak
+3. Press Right Alt again — recording stops, speech is transcribed
+4. The text is **automatically appended to today's notes file** (no Ctrl+V needed)
+
+## Hotkeys summary
+
+| Key                     | Mode | Result |
+|-------------------------|------|--------|
+| Right Alt               | Clipboard | Transcribed text → clipboard (paste with Ctrl+V) |
+| Right Alt + Right Shift | Notes | Transcribed text → today's notes file |
 
 ---
 
@@ -126,23 +140,30 @@ For daily heavy use, a dedicated GPU makes a noticeable difference.
 
 ---
 
-## How autostart works
+## Autostart on Windows login
 
-On first run, the app places a small startup file here:
+On first run, Speakboard registers itself to start automatically when you turn on your computer.
+It places a small file here:
 
 ```
 C:\Users\YourName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\speakboard.bat
 ```
 
-Windows automatically runs everything in that Startup folder when you log in.
-To **disable autostart**, just delete `speakboard.bat` from that folder.
+After that, every time you log into Windows, Speakboard launches silently in the background —
+the tray icon appears and the hotkeys are ready immediately, no manual launch needed.
+
+To **disable autostart**, delete `speakboard.bat` from the path above.
+You can navigate there by pressing `Win + R` and typing `shell:startup`.
 
 ---
 
 ## Notes file format
 
-Notes are saved as plain text files named `DD.MM` (e.g. `22.05`) in your `NOTES_DIR` folder.
-Multiple recordings in the same minute are grouped under one timestamp:
+Each day gets its own plain text file named `DD.MM` (e.g. `22.05`) in your notes folder.
+You can open and edit these files with any text editor (Notepad, VS Code, etc.).
+
+Each entry starts with the time it was recorded. Multiple recordings within the same
+minute are grouped together under one timestamp — no duplicate headers:
 
 ```
 14:32
@@ -151,20 +172,23 @@ First entry recorded at 14:32.
 Also recorded at 14:32 — grouped under the same timestamp.
 
 17:05
-New entry at a different time gets its own timestamp.
+New recording at a different time gets its own timestamp.
 ```
+
+Long text is automatically wrapped at 80 characters per line, never cutting mid-word.
 
 ---
 
 ## System tray menu
 
-Right-click the tray icon (bottom-right corner):
+After launching, a microphone icon appears in the bottom-right corner of the taskbar (system tray).
+Right-click it to open the menu:
 
-| Item | Action |
-|------|--------|
-| Open notes folder | Opens your notes folder in Explorer |
-| Reload model | Reloads the AI model without restarting the app |
-| Exit | Closes Speakboard |
+| Item | What it does |
+|------|-------------|
+| **Open notes folder** | Opens the folder where your daily note files are saved, so you can read or edit them |
+| **Reload model** | Restarts the AI transcription model — useful if something went wrong or the app feels stuck |
+| **Exit** | Closes Speakboard completely |
 
 ---
 

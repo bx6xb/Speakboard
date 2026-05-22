@@ -79,6 +79,17 @@ def setup_autostart():
         r"Microsoft\Windows\Start Menu\Programs\Startup",
     )
     bat_path = os.path.join(startup_dir, "speakboard.bat")
+
+    # Remove any leftover bat files from old names
+    for old_name in ("stt_app.bat", "voxdrop.bat"):
+        old_path = os.path.join(startup_dir, old_name)
+        if os.path.exists(old_path):
+            try:
+                os.remove(old_path)
+                print(f"[Autostart] Removed old startup entry: {old_name}")
+            except Exception:
+                pass
+
     if os.path.exists(bat_path):
         return
     python_exe = sys.executable
