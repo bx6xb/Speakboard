@@ -51,7 +51,7 @@ def append_note(notes_dir: str, text: str):
     os.makedirs(notes_dir, exist_ok=True)
 
     today = datetime.now()
-    filename = today.strftime("%d.%m")
+    filename = today.strftime("%d.%m.txt")
     filepath = os.path.join(notes_dir, filename)
 
     time_str = today.strftime("%H:%M")
