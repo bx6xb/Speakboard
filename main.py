@@ -73,33 +73,48 @@ def _check_admin():
 
 # ─── Autostart ───────────────────────────────────────────────────────────────
 
+def _pythonw_exe() -> str:
+    """Return pythonw.exe (no console window). Falls back to python.exe if not found."""
+    exe = sys.executable
+    candidate = os.path.join(os.path.dirname(exe),
+                             os.path.basename(exe).lower().replace("python", "pythonw"))
+    return candidate if os.path.exists(candidate) else exe
+
+
 def setup_autostart():
     startup_dir = os.path.join(
         os.environ.get("APPDATA", ""),
         r"Microsoft\Windows\Start Menu\Programs\Startup",
     )
-    bat_path = os.path.join(startup_dir, "speakboard.bat")
+    vbs_path = os.path.join(startup_dir, "speakboard.vbs")
 
-    # Remove any leftover bat files from old names
-    for old_name in ("stt_app.bat", "voxdrop.bat"):
-        old_path = os.path.join(startup_dir, old_name)
-        if os.path.exists(old_path):
+    # Remove leftovers from old names / old formats
+    for old_name in ("stt_app.bat", "voxdrop.bat", "speakboard.bat"):
+        old = os.path.join(startup_dir, old_name)
+        if os.path.exists(old):
             try:
-                os.remove(old_path)
+                os.remove(old)
                 print(f"[Autostart] Removed old startup entry: {old_name}")
             except Exception:
                 pass
 
-    if os.path.exists(bat_path):
+    if os.path.exists(vbs_path):
         return
-    python_exe = sys.executable
-    script_path = os.path.abspath(__file__)
-    bat_content = f'@echo off\nstart "" "{python_exe}" "{script_path}"\n'
+
+    pythonw  = _pythonw_exe()
+    script   = os.path.abspath(__file__)
+
+    # VBS runs the process with window style 0 = completely hidden — no console, no flash
+    vbs = (
+        'Set sh = CreateObject("WScript.Shell")\n'
+        f'sh.Run Chr(34) & "{pythonw}" & Chr(34) & " " & Chr(34) & "{script}" & Chr(34), 0, False\n'
+    )
+
     try:
         os.makedirs(startup_dir, exist_ok=True)
-        with open(bat_path, "w") as f:
-            f.write(bat_content)
-        print(f"[Autostart] Added to Windows startup: {bat_path}")
+        with open(vbs_path, "w", encoding="utf-8") as f:
+            f.write(vbs)
+        print(f"[Autostart] Added to Windows startup: {vbs_path}")
     except Exception as e:
         print(f"[Autostart] Error: {e}")
 

@@ -143,17 +143,17 @@ For daily heavy use, a dedicated GPU makes a noticeable difference.
 ## Autostart on Windows login
 
 On first run, Speakboard registers itself to start automatically when you turn on your computer.
-It places a small file here:
+It places a small background launcher here:
 
 ```
-C:\Users\YourName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\speakboard.bat
+C:\Users\YourName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\speakboard.vbs
 ```
 
 After that, every time you log into Windows, Speakboard launches silently in the background —
-the tray icon appears and the hotkeys are ready immediately, no manual launch needed.
+**no console window, no flashing** — only the tray icon appears in the bottom-right corner.
 
-To **disable autostart**, delete `speakboard.bat` from the path above.
-You can navigate there by pressing `Win + R` and typing `shell:startup`.
+To **disable autostart**, delete `speakboard.vbs` from the path above.
+You can navigate there instantly by pressing `Win + R` and typing `shell:startup`.
 
 ---
 
