@@ -2,6 +2,8 @@
 
 > Press a hotkey. Speak. Text appears.
 
+**GitHub description:** *Hotkey-driven Windows speech-to-text overlay powered by faster-whisper. Records on demand, transcribes locally on GPU, copies to clipboard or appends to daily notes — no cloud, no window, no friction.*
+
 A lightweight Windows overlay app that transcribes your speech using a local
 Whisper model — no cloud, no subscription, no latency except your own GPU.
 Runs silently in the system tray and is controlled entirely by hotkeys.
@@ -59,7 +61,7 @@ If CUDA is unavailable, the app automatically falls back to the `medium` model o
 
 ### 4. Configure your environment
 
-Copy the example env file and fill in your path:
+Copy the example file and fill in your path:
 
 ```bash
 copy .env.example .env
@@ -71,8 +73,11 @@ Open `.env` and set your notes directory:
 NOTES_DIR=C:/Users/YourName/Documents/Notes
 ```
 
-The folder will be created automatically on first use if it doesn't exist.
-`.env` is listed in `.gitignore` — your personal path never ends up in the repository.
+> **Notes mode won't start recording until `NOTES_DIR` is set.** If it's missing,
+> the overlay will flash `⚠ Set NOTES_DIR in .env` instead of recording.
+
+The folder is created automatically if it doesn't exist.
+`.env` is in `.gitignore` — your personal path never ends up in the repository.
 
 ### 5. Run
 

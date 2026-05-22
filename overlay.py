@@ -9,6 +9,7 @@ STATE_TRANSCRIBING = "transcribing"
 STATE_DONE_PASTE   = "done_paste"
 STATE_DONE_CLIP    = "done_clipboard"
 STATE_DONE_NOTE    = "done_note"
+STATE_NO_CONFIG    = "no_config"
 
 THEME_PASTE = {
     "bg":      "#111111",
@@ -155,6 +156,8 @@ class Overlay:
             self._draw_dots(c, th, cx, cy)
         elif self._state in (STATE_DONE_PASTE, STATE_DONE_CLIP, STATE_DONE_NOTE):
             self._draw_done(c, th, cx, cy)
+        elif self._state == STATE_NO_CONFIG:
+            self._draw_no_config(c, cx, cy)
 
     def _draw_wave(self, c, th, cx, cy):
         amp = self._amp_smooth
@@ -185,6 +188,11 @@ class Overlay:
             c.create_oval(dx - DOT_R, dy - DOT_R,
                           dx + DOT_R, dy + DOT_R,
                           fill=th["fg"], outline="")
+
+    def _draw_no_config(self, c, cx, cy):
+        c.create_text(cx, cy, text="⚠  Set NOTES_DIR in .env",
+                      fill="#f38ba8", font=("Segoe UI", 11, "bold"),
+                      anchor="center")
 
     def _draw_done(self, c, th, cx, cy):
         labels = {
@@ -264,6 +272,20 @@ class Overlay:
             self._cancel_hide()
             self._state = STATE_TRANSCRIBING
             self._start_anim()
+        if self._root:
+            self._root.after(0, _go)
+
+    def show_no_config(self):
+        """Flash the 'configure .env' warning and auto-hide."""
+        def _go():
+            self._cancel_hide()
+            self._theme = THEME_NOTES  # light theme for visibility
+            self._stop_anim()
+            self._state = STATE_NO_CONFIG
+            self._reposition()
+            self._root.deiconify()
+            self._draw()
+            self._sched_hide()
         if self._root:
             self._root.after(0, _go)
 

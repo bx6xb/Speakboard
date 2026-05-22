@@ -188,6 +188,13 @@ class App:
                     threading.Thread(target=self._stop_and_process, args=(mode,), daemon=True).start()
 
     def _start_recording(self, mode: str):
+        if mode == "notes" and not self.config.get("notes_dir", "").strip():
+            print("[Config] NOTES_DIR is not set — configure .env before using notes mode.")
+            self.overlay.show_no_config()
+            with self._state_lock:
+                self.state = AppState.IDLE
+            return
+
         self.overlay.show_recording(mode)
         self.recorder.start()
 
@@ -215,9 +222,6 @@ class App:
                 append_note(self.config["notes_dir"], text)
                 self.overlay.show_done("note")
 
-        except NotesDirNotConfigured as e:
-            print(f"[Config] {e}")
-            self.overlay.hide()
         except Exception as e:
             print(f"[Error] {e}")
             self.overlay.hide()
