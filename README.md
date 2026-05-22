@@ -1,29 +1,37 @@
-# Speech → Text (STT App)
+# VoxDrop
 
-A real-time speech recognition app with a floating overlay UI.
-Runs entirely in the background — controlled by hotkeys, no window to open.
+> Press a hotkey. Speak. Text appears.
+
+A lightweight Windows overlay app that transcribes your speech using a local
+Whisper model — no cloud, no subscription, no latency except your own GPU.
+Runs silently in the system tray and is controlled entirely by hotkeys.
 
 ---
 
 ## Hotkeys
 
-| Key                     | Mode           | Action                                               |
-|-------------------------|----------------|------------------------------------------------------|
-| Right Alt               | Clipboard mode | Press to start recording, press again to stop → text copied to clipboard |
-| Right Alt + Right Shift | Notes mode     | Press to start recording, press again to stop → text appended to daily notes file |
+| Key                     | Mode           | What happens                                             |
+|-------------------------|----------------|----------------------------------------------------------|
+| Right Alt               | Clipboard mode | Start recording → press again to stop → text copied to clipboard |
+| Right Alt + Right Shift | Notes mode     | Start recording → press again to stop → text appended to today's notes file |
 
 ---
 
-## Quick start
+## Installation
 
-### 1. Create a virtual environment (recommended)
+### 1. Clone and create a virtual environment
 
 ```bash
+git clone <repo-url>
+cd voxdrop
+
 python -m venv venv
 venv\Scripts\activate
 ```
 
-> Using a venv keeps project dependencies isolated and avoids conflicts with other Python projects on your system. Always activate it before running the app or installing packages.
+> A virtual environment keeps the project's dependencies isolated from the
+> rest of your Python installation. Always activate it before running or
+> installing anything.
 
 ### 2. Install dependencies
 
@@ -31,98 +39,93 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Install PyTorch (choose based on your hardware)
+### 3. Install PyTorch for your hardware
 
-**torch is NOT included in requirements.txt** because the correct version depends on your GPU.
+`torch` is **not** in `requirements.txt` because the correct version depends on
+your GPU. Pick the right command below:
 
-**RTX 50-series (Blackwell — 5060 Ti, 5070, 5080, 5090):**
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cu128
-```
-
-**RTX 30/40-series:**
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cu121
-```
-
-**No GPU / CPU only:**
-```bash
-pip install torch
-```
+| Hardware | Command |
+|----------|---------|
+| RTX 50-series (5060 Ti, 5070 …) | `pip install torch --index-url https://download.pytorch.org/whl/cu128` |
+| RTX 30/40-series | `pip install torch --index-url https://download.pytorch.org/whl/cu121` |
+| No GPU / CPU only | `pip install torch` |
 
 Verify your GPU is detected:
 ```bash
 python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0))"
 ```
 
-### 4. Run
+If CUDA is unavailable, the app automatically falls back to the `medium` model on CPU.
+
+### 4. Configure your environment
+
+Copy the example env file and fill in your path:
+
+```bash
+copy .env.example .env
+```
+
+Open `.env` and set your notes directory:
+
+```env
+NOTES_DIR=C:/Users/YourName/Documents/Notes
+```
+
+The folder will be created automatically on first use if it doesn't exist.
+`.env` is listed in `.gitignore` — your personal path never ends up in the repository.
+
+### 5. Run
 
 ```bash
 python main.py
 ```
 
-On first launch:
-- `config.json` is created with default settings
-- A `.bat` file is added to the Windows Startup folder so the app starts automatically on boot
+On first launch, a `.bat` file is added to the Windows Startup folder so the
+app starts automatically on every login.
 
 ---
 
-## GPU vs CPU — will it run on a laptop without a GPU?
+## GPU vs CPU
 
-**Yes.** The app detects available hardware at startup and chooses automatically:
+| Hardware | Model | Speed |
+|----------|-------|-------|
+| NVIDIA GPU (CUDA) | `large-v3` | ~real-time |
+| CPU only | `medium` | 2–5× the recording duration |
 
-| Hardware | Model used | Speed |
-|----------|-----------|-------|
-| NVIDIA GPU (CUDA) | `large-v3` | Fast — roughly real-time |
-| CPU only | `medium` | Slower — ~2–5× the recording duration |
-
-A **Ryzen 7 5850U** (or similar mid-range laptop CPU) will work fine with the `medium` model.
-A 10-second recording might take 20–40 seconds to transcribe — usable, but not instant.
-For daily driver use, a GPU (even a laptop GPU like 3050/4060) makes a big difference.
+A **Ryzen 7 5850U** (or similar mid-range laptop CPU) will work fine with the
+`medium` model — a 10-second clip might take 20–40 seconds to transcribe.
+For daily use, even a laptop GPU (RTX 3050/4060) makes a big difference.
 
 ---
 
-## Autostart — how it works
+## How autostart works
 
-On the very first run, the app writes a file here:
+On first run, the app writes:
 
 ```
-%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\stt_app.bat
+%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\voxdrop.bat
 ```
 
-Windows runs everything in that Startup folder automatically on login. The `.bat` launches Python with `main.py` in the background. After boot, the tray icon appears and the hotkeys are live — you can press Right Alt at any time to start recording, no extra steps needed.
+Windows runs everything in that folder on login. After boot, the tray icon
+appears silently and the hotkeys are immediately live — press Right Alt any time.
 
-> If you want to disable autostart, just delete `stt_app.bat` from the Startup folder above.
-
----
-
-## Changing the notes directory
-
-Open `config.json` and edit the path:
-
-```json
-{
-    "notes_dir": "C:/Users/YourName/Documents/Notes"
-}
-```
-
-Restart the app after saving.
+To disable autostart, delete `voxdrop.bat` from the Startup folder above.
 
 ---
 
 ## Notes file format
 
-Files are named `DD.MM` (e.g. `22.05`) and stored in the notes directory.
+Files are named `DD.MM` (e.g. `22.05`) and stored in the `NOTES_DIR` folder.
 
 ```
 14:32
 
-First entry text, automatically word-wrapped at 80 characters
-per line, never breaking mid-word.
+First entry, automatically word-wrapped at 80 characters per line
+without ever breaking mid-word.
 
 17:05
 
-Second entry text.
+Second entry.
 
 ```
 
@@ -131,31 +134,34 @@ Second entry text.
 ## System tray
 
 Right-click the tray icon:
-- **Open notes folder** — opens the notes directory in Explorer
-- **Reload model** — reloads the Whisper model without restarting
-- **Exit** — closes the app
+
+| Item | Action |
+|------|--------|
+| Open notes folder | Opens `NOTES_DIR` in Explorer |
+| Reload model | Reloads the Whisper model without restarting the app |
+| Exit | Closes the app |
 
 ---
 
-## Running as administrator
+## Tips
 
-For reliable hotkey capture in all apps (browsers, games, IDEs), run the terminal as administrator before launching:
-
+**Run as administrator** for reliable hotkey capture across all apps (browsers,
+games, elevated processes):
 ```bash
 # In an admin PowerShell:
 python main.py
 ```
 
-To debug what key names your keyboard reports:
+**Debug key names** if hotkeys aren't working (useful for non-US keyboard layouts):
 ```bash
 python main.py --debug
 ```
 
 ---
 
-## System requirements
+## Requirements
 
 - Windows 10 / 11
 - Python 3.10+
 - Microphone
-- NVIDIA GPU with CUDA 12.x (optional — highly recommended for speed)
+- NVIDIA GPU with CUDA 12.x *(optional — strongly recommended)*

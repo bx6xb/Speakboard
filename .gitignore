@@ -1,3 +1,6 @@
+# Environment — personal paths and secrets, never commit this
+.env
+
 # Python
 __pycache__/
 *.py[cod]

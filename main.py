@@ -8,13 +8,13 @@ Hotkeys:
 Run with --debug to print all key events and identify key names on your system.
 """
 
-import json
 import os
 import sys
 import threading
 import time
 import ctypes
 
+from dotenv import load_dotenv
 import keyboard
 import pyperclip
 
@@ -32,9 +32,6 @@ from notes import append_note, open_notes_folder, NotesDirNotConfigured
 from tray import TrayIcon
 
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
-DEFAULT_CONFIG = {"notes_dir": "C:/Users/User/Documents/Notes"}
-
 # ─── State ───────────────────────────────────────────────────────────────────
 
 class AppState:
@@ -46,17 +43,19 @@ class AppState:
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
-def load_config():
-    if not os.path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(DEFAULT_CONFIG, f, indent=4, ensure_ascii=False)
-        return dict(DEFAULT_CONFIG)
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    # Fill missing keys with defaults
-    for k, v in DEFAULT_CONFIG.items():
-        data.setdefault(k, v)
-    return data
+def load_config() -> dict:
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    load_dotenv(env_path)
+
+    notes_dir = os.environ.get("NOTES_DIR", "").strip()
+
+    if not notes_dir:
+        print("[Config] NOTES_DIR is not set.")
+        print("  Create a .env file next to main.py and add:")
+        print("  NOTES_DIR=C:/Users/YourName/Documents/Notes")
+        print("  (see .env.example for reference)")
+
+    return {"notes_dir": notes_dir}
 
 
 # ─── Admin check ─────────────────────────────────────────────────────────────
