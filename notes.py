@@ -48,7 +48,7 @@ def append_note(notes_dir: str, text: str):
     with open(filepath, "a", encoding="utf-8") as f:
         if has_content:
             f.write("\n")
-        f.write(f"{time_str}\n\n")
+        f.write(f"{time_str}\n")
         f.write(wrapped)
         f.write("\n")
 

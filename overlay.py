@@ -191,7 +191,7 @@ class Overlay:
 
     def _draw_no_config(self, c, cx, cy):
         c.create_text(cx, cy, text="⚠  Set NOTES_DIR in .env",
-                      fill="#f38ba8", font=("Segoe UI", 11, "bold"),
+                      fill="#111111", font=("Segoe UI", 11, "bold"),
                       anchor="center")
 
     def _draw_done(self, c, th, cx, cy):

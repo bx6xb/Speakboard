@@ -21,19 +21,18 @@ Runs silently in the system tray and is controlled entirely by hotkeys.
 
 ## Installation
 
-### 1. Clone and create a virtual environment
+### 1. Get the code and create a virtual environment
+
+Download or clone the repository, then open a terminal inside the project folder and run:
 
 ```bash
-git clone <repo-url>
-cd voxdrop
-
 python -m venv venv
 venv\Scripts\activate
 ```
 
-> A virtual environment keeps the project's dependencies isolated from the
-> rest of your Python installation. Always activate it before running or
-> installing anything.
+You should see `(venv)` appear at the start of the terminal line — that means the virtual environment is active.
+
+> **What is a virtual environment?** It's an isolated copy of Python just for this project, so the libraries installed here don't interfere with anything else on your computer. You need to activate it (`venv\Scripts\activate`) every time you open a new terminal before running the app.
 
 ### 2. Install dependencies
 
@@ -124,14 +123,11 @@ Files are named `DD.MM` (e.g. `22.05`) and stored in the `NOTES_DIR` folder.
 
 ```
 14:32
-
 First entry, automatically word-wrapped at 80 characters per line
 without ever breaking mid-word.
 
 17:05
-
 Second entry.
-
 ```
 
 ---
