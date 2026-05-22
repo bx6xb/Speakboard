@@ -1,8 +1,8 @@
-# VoxDrop
+# Speakboard
 
 > Press a hotkey. Speak. Text appears.
 
-**GitHub description:** *Hotkey-driven Windows speech-to-text overlay powered by faster-whisper. Records on demand, transcribes locally on GPU, copies to clipboard or appends to daily notes — no cloud, no window, no friction.*
+**GitHub description:** *Hotkey-driven Windows speech-to-text overlay powered by faster-whisper. Press a key, speak, get text — transcribes locally on GPU, copies to clipboard or appends to daily notes. No cloud, no window, no friction.*
 
 A lightweight Windows overlay app that transcribes your speech using a local
 Whisper model — no cloud, no subscription, no latency except your own GPU.
@@ -107,13 +107,13 @@ For daily use, even a laptop GPU (RTX 3050/4060) makes a big difference.
 On first run, the app writes:
 
 ```
-%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\voxdrop.bat
+%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\speakboard.bat
 ```
 
 Windows runs everything in that folder on login. After boot, the tray icon
 appears silently and the hotkeys are immediately live — press Right Alt any time.
 
-To disable autostart, delete `voxdrop.bat` from the Startup folder above.
+To disable autostart, delete `speakboard.bat` from the Startup folder above.
 
 ---
 

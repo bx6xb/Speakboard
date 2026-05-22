@@ -78,7 +78,7 @@ def setup_autostart():
         os.environ.get("APPDATA", ""),
         r"Microsoft\Windows\Start Menu\Programs\Startup",
     )
-    bat_path = os.path.join(startup_dir, "stt_app.bat")
+    bat_path = os.path.join(startup_dir, "speakboard.bat")
     if os.path.exists(bat_path):
         return
     python_exe = sys.executable
