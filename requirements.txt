@@ -1,0 +1,21 @@
+faster-whisper
+sounddevice
+keyboard
+pyautogui
+pyperclip
+pystray
+Pillow
+numpy
+
+# torch is NOT installed via this file — install manually based on your GPU:
+#
+#   RTX 50-series (Blackwell, e.g. 5060 Ti):
+#     pip install torch --index-url https://download.pytorch.org/whl/cu128
+#
+#   RTX 30/40-series:
+#     pip install torch --index-url https://download.pytorch.org/whl/cu121
+#
+#   No GPU / CPU only:
+#     pip install torch
+#
+# If torch is missing, the app falls back to CPU automatically (medium model).

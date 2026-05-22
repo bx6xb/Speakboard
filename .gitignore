@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Temp audio files created during recording
+*.wav
+*.tmp
+
+# IDE / OS
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# Model cache (downloaded automatically by faster-whisper, stored in ~/.cache)
+# Not in project dir, but listed here for clarity
+models/
+
+# Logs
+*.log
