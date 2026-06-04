@@ -36,6 +36,17 @@ It runs silently in the system tray and is controlled entirely by hotkeys.
 > **Before you start:** make sure [Python 3.10 or newer](https://www.python.org/downloads/) is installed.
 > During installation, check the box **"Add Python to PATH"**.
 
+### Installing with Cursor or another AI agent
+
+You can ask **Cursor**, **Claude Code**, **GitHub Copilot**, or any similar coding agent to set up
+the project for you. Open the project folder in the agent and paste something like:
+
+> Set up Speakboard on my Windows PC: create a virtual environment, install dependencies from
+> `requirements.txt`, install the correct PyTorch build for my GPU (see the table in README),
+> copy `.env.example` to `.env`, and ask me for my notes folder path to fill in `NOTES_DIR`.
+
+The agent should follow the steps below. Project context for agents lives in `AGENTS.md`.
+
 ### 1. Download the project
 
 Download the ZIP from GitHub (green **Code** button → **Download ZIP**),
@@ -193,6 +204,19 @@ Right-click it to open the menu:
 ---
 
 ## Troubleshooting
+
+**App not in the tray after reboot / something broke at startup:**
+
+Speakboard writes a log file next to `main.py`:
+
+```
+speakboard.log
+```
+
+Open it in any text editor. A healthy startup ends with `[App] Ready.`
+If the file is missing, empty, or stops earlier (especially before `Model loaded`), that line
+shows where startup failed. Fatal errors include a full traceback.
+The previous log is kept as `speakboard.log.old` when the file gets large.
 
 **Hotkeys don't work in some apps (browsers, games):**
 Run the terminal as administrator before launching:

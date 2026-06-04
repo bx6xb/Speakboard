@@ -29,3 +29,5 @@ models/
 
 # Logs
 *.log
+*.log.old
+speakboard.log*

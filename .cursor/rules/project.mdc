@@ -13,6 +13,7 @@ entirely by hotkeys. No window, no cloud. Transcribes via local faster-whisper m
 | File | Responsibility |
 |------|---------------|
 | `main.py` | Entry point. App state machine, hotkey hook, wires everything together |
+| `logger.py` | Startup/runtime logging to `speakboard.log` (gitignored) |
 | `recorder.py` | Microphone capture via `sounddevice`. Writes temp `.wav`, exposes amplitude callback |
 | `transcriber.py` | `faster-whisper` wrapper. Auto-detects CUDA/CPU, loads model once at startup |
 | `overlay.py` | Tkinter floating pill UI. Runs in a daemon thread, all updates via `root.after()` |
@@ -73,6 +74,16 @@ and refuses to record (does not crash). Clipboard mode works without `.env`.
 `setup_autostart()` in `main.py` creates `speakboard.vbs` in the Windows Startup folder.
 VBS launches `pythonw.exe` (no console) with window style `0` (fully hidden).
 Also cleans up old names: `stt_app.bat`, `voxdrop.bat`, `speakboard.bat`.
+
+## Logging (`speakboard.log`)
+
+- Written next to `main.py` on every launch. Gitignored (`*.log`).
+- Records startup steps (GPU, model load, autostart, Ready), warnings, and errors.
+- Rotates to `speakboard.log.old` when the file exceeds 512 KB.
+- With `pythonw` / autostart there is no console — the log file is the only trace.
+- **When the user reports a startup or runtime problem**, read `speakboard.log` first.
+  If the file is missing or ends before `[App] Ready`, the app crashed or never started.
+  Check the last lines and any `ERROR` / traceback entries.
 
 ## Transcription
 

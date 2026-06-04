@@ -1,6 +1,8 @@
 import torch
 from faster_whisper import WhisperModel
 
+from logger import get_logger
+
 
 def _get_device_and_model():
     if torch.cuda.is_available():
@@ -18,9 +20,9 @@ class Transcriber:
         device, model_size, compute_type = _get_device_and_model()
         self.device = device
         self.model_size = model_size
-        print(f"[Transcriber] Loading model {model_size} on {device}...")
+        get_logger().info("[Transcriber] Loading model %s on %s...", model_size, device)
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
-        print(f"[Transcriber] Model loaded.")
+        get_logger().info("[Transcriber] Model loaded.")
 
     def reload(self):
         self.model = None

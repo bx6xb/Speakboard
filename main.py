@@ -18,6 +18,8 @@ from dotenv import load_dotenv
 import keyboard
 import pyperclip
 
+from logger import get_logger, log_fatal, log_startup_banner, setup_logging
+
 
 # Right Alt key can have different names depending on OS locale / keyboard layout.
 # "altgr" is common on Windows with non-US layouts (Russian, German, etc.)
@@ -50,10 +52,10 @@ def load_config() -> dict:
     notes_dir = os.environ.get("NOTES_DIR", "").strip()
 
     if not notes_dir:
-        print("[Config] NOTES_DIR is not set.")
-        print("  Create a .env file next to main.py and add:")
-        print("  NOTES_DIR=C:/Users/YourName/Documents/Notes")
-        print("  (see .env.example for reference)")
+        get_logger().info("[Config] NOTES_DIR is not set.")
+        get_logger().info("  Create a .env file next to main.py and add:")
+        get_logger().info("  NOTES_DIR=C:/Users/YourName/Documents/Notes")
+        get_logger().info("  (see .env.example for reference)")
 
     return {"notes_dir": notes_dir}
 
@@ -66,9 +68,9 @@ def _check_admin():
     except Exception:
         is_admin = False
     if not is_admin:
-        print("[Warning] Running WITHOUT administrator rights.")
-        print("  The keyboard library may not intercept keys in some apps.")
-        print("  Run the terminal as Administrator for reliable hotkey capture.")
+        get_logger().warning("[Warning] Running WITHOUT administrator rights.")
+        get_logger().warning("  The keyboard library may not intercept keys in some apps.")
+        get_logger().warning("  Run the terminal as Administrator for reliable hotkey capture.")
 
 
 # ─── Autostart ───────────────────────────────────────────────────────────────
@@ -94,11 +96,12 @@ def setup_autostart():
         if os.path.exists(old):
             try:
                 os.remove(old)
-                print(f"[Autostart] Removed old startup entry: {old_name}")
+                get_logger().info("[Autostart] Removed old startup entry: %s", old_name)
             except Exception:
                 pass
 
     if os.path.exists(vbs_path):
+        get_logger().info("[Autostart] Startup entry already present: %s", vbs_path)
         return
 
     pythonw  = _pythonw_exe()
@@ -114,24 +117,25 @@ def setup_autostart():
         os.makedirs(startup_dir, exist_ok=True)
         with open(vbs_path, "w", encoding="utf-8") as f:
             f.write(vbs)
-        print(f"[Autostart] Added to Windows startup: {vbs_path}")
+        get_logger().info("[Autostart] Added to Windows startup: %s", vbs_path)
     except Exception as e:
-        print(f"[Autostart] Error: {e}")
+        get_logger().error("[Autostart] Error: %s", e)
 
 
 # ─── GPU check ────────────────────────────────────────────────────────────────
 
 def _check_gpu():
+    log = get_logger()
     try:
         import torch
         if torch.cuda.is_available():
             name = torch.cuda.get_device_name(0)
             mb = torch.cuda.get_device_properties(0).total_memory // (1024 ** 2)
-            print(f"[GPU] {name} — {mb} MB VRAM — CUDA active ✓")
+            log.info("[GPU] %s - %s MB VRAM - CUDA active", name, mb)
         else:
-            print("[GPU] CUDA not available — running on CPU")
+            log.info("[GPU] CUDA not available - running on CPU")
     except ImportError:
-        print("[GPU] torch not installed, cannot verify CUDA")
+        log.info("[GPU] torch not installed, cannot verify CUDA")
 
 
 # ─── Core app ────────────────────────────────────────────────────────────────
@@ -172,7 +176,10 @@ class App:
 
     def _on_key_event(self, event):
         if DEBUG_KEYS:
-            print(f"[KEY] name={event.name!r:20s} scan={event.scan_code:4d} type={event.event_type}")
+            get_logger().info(
+                "[KEY] name=%r scan=%d type=%s",
+                event.name, event.scan_code, event.event_type,
+            )
 
         # Track right shift state independently — catches any press order
         if event.name == "right shift":
@@ -215,7 +222,7 @@ class App:
 
     def _start_recording(self, mode: str):
         if mode == "notes" and not self.config.get("notes_dir", "").strip():
-            print("[Config] NOTES_DIR is not set — configure .env before using notes mode.")
+            get_logger().warning("[Config] NOTES_DIR is not set - configure .env before using notes mode.")
             self.overlay.show_no_config()
             with self._state_lock:
                 self.state = AppState.IDLE
@@ -249,7 +256,7 @@ class App:
                 self.overlay.show_done("note")
 
         except Exception as e:
-            print(f"[Error] {e}")
+            get_logger().exception("[Error] %s", e)
             self.overlay.hide()
         finally:
             with self._state_lock:
@@ -258,32 +265,42 @@ class App:
     # ── Startup ───────────────────────────────────────────────────────────────
 
     def run(self):
+        log = get_logger()
         _check_admin()
         setup_autostart()
 
         _check_gpu()
-        print("[App] Loading Whisper model...")
+        log.info("[App] Loading Whisper model...")
         self.transcriber.load()
-        print("[App] Model ready.")
+        log.info("[App] Model ready.")
 
         self.tray.start()
 
         keyboard.hook(self._on_key_event)
 
         if DEBUG_KEYS:
-            print("[DEBUG] Key debug mode enabled. Press any key...")
-        print("[App] Ready.  Right Alt = record/paste  |  Right Alt + Right Shift = record/notes  |  Ctrl+C = exit")
+            log.info("[DEBUG] Key debug mode enabled. Press any key...")
+        log.info(
+            "[App] Ready.  Right Alt = record/paste  |  "
+            "Right Alt + Right Shift = record/notes  |  Ctrl+C = exit"
+        )
 
         try:
             while True:
                 time.sleep(0.5)
         except KeyboardInterrupt:
-            print("[App] Exiting.")
+            log.info("[App] Exiting.")
             self._quit()
 
 
 # ─── Entry ────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    app = App()
-    app.run()
+    setup_logging()
+    log_startup_banner()
+    try:
+        app = App()
+        app.run()
+    except Exception as exc:
+        log_fatal(exc)
+        sys.exit(1)
