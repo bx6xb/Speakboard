@@ -2,8 +2,8 @@
 main.py — Entry point for the Speech-to-Text overlay app.
 
 Hotkeys:
-  Right Alt          → Paste mode (toggle recording)
-  Right Alt + Shift  → Notes mode (toggle recording)
+  Caps Lock              → Paste mode (toggle recording)
+  Caps Lock + Left Shift → Notes mode (toggle recording)
 
 Run with --debug to print all key events and identify key names on your system.
 """
@@ -21,9 +21,8 @@ import pyperclip
 from logger import get_logger, log_fatal, log_startup_banner, setup_logging
 
 
-# Right Alt key can have different names depending on OS locale / keyboard layout.
-# "altgr" is common on Windows with non-US layouts (Russian, German, etc.)
-RALT_NAMES = {"right alt", "altgr", "alt gr", "right menu"}
+# Caps Lock — reported as "caps lock" on Windows. Run with --debug if your layout differs.
+CAPS_LOCK_NAMES = {"caps lock"}
 
 DEBUG_KEYS = "--debug" in sys.argv
 
@@ -155,9 +154,9 @@ class App:
             on_quit=self._quit,
         )
 
-        self._ralt_pressed       = False
-        self._rshift_pressed     = False  # tracked independently in the hook
-        self._notes_mode_pending = False  # true if rshift was held at any point during ralt press
+        self._caps_pressed       = False
+        self._lshift_pressed     = False  # tracked independently in the hook
+        self._notes_mode_pending = False  # true if lshift was held at any point during caps press
 
     def _on_amplitude(self, amp: float):
         self.overlay.update_amplitudes(amp)
@@ -181,30 +180,30 @@ class App:
                 event.name, event.scan_code, event.event_type,
             )
 
-        # Track right shift state independently — catches any press order
-        if event.name == "right shift":
+        # Track left shift state independently — catches any press order
+        if event.name == "left shift":
             if event.event_type == keyboard.KEY_DOWN:
-                self._rshift_pressed = True
-                if self._ralt_pressed:
+                self._lshift_pressed = True
+                if self._caps_pressed:
                     self._notes_mode_pending = True
             else:
-                self._rshift_pressed = False
+                self._lshift_pressed = False
             return
 
-        if event.name not in RALT_NAMES:
+        if event.name not in CAPS_LOCK_NAMES:
             return
 
         if event.event_type == keyboard.KEY_DOWN:
-            if not self._ralt_pressed:
-                self._ralt_pressed = True
-                # Also catch case where shift was already held before ralt
-                self._notes_mode_pending = self._rshift_pressed
+            if not self._caps_pressed:
+                self._caps_pressed = True
+                # Also catch case where shift was already held before caps lock
+                self._notes_mode_pending = self._lshift_pressed
             return
 
         if event.event_type == keyboard.KEY_UP:
-            if not self._ralt_pressed:
+            if not self._caps_pressed:
                 return
-            self._ralt_pressed = False
+            self._caps_pressed = False
             notes = self._notes_mode_pending
             self._notes_mode_pending = False
 
@@ -281,8 +280,8 @@ class App:
         if DEBUG_KEYS:
             log.info("[DEBUG] Key debug mode enabled. Press any key...")
         log.info(
-            "[App] Ready.  Right Alt = record/paste  |  "
-            "Right Alt + Right Shift = record/notes  |  Ctrl+C = exit"
+            "[App] Ready.  Caps Lock = record/paste  |  "
+            "Caps Lock + Left Shift = record/notes  |  Ctrl+C = exit"
         )
 
         try:

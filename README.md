@@ -10,24 +10,24 @@ It runs silently in the system tray and is controlled entirely by hotkeys.
 
 ## How it works — two modes
 
-**Clipboard mode** (Right Alt):
-1. Press Right Alt — a small overlay appears at the bottom of the screen, recording starts
+**Clipboard mode** (Caps Lock):
+1. Press Caps Lock — a small overlay appears at the bottom of the screen, recording starts
 2. Speak
-3. Press Right Alt again — recording stops, speech is transcribed
+3. Press Caps Lock again — recording stops, speech is transcribed
 4. The resulting text is **copied to your clipboard** — paste it anywhere with Ctrl+V
 
-**Notes mode** (Right Alt + Right Shift):
-1. Hold Right Shift, then press Right Alt — overlay appears in light theme, recording starts
+**Notes mode** (Caps Lock + Left Shift):
+1. Hold Left Shift, then press Caps Lock — overlay appears in light theme, recording starts
 2. Speak
-3. Press Right Alt again — recording stops, speech is transcribed
+3. Press Caps Lock again — recording stops, speech is transcribed
 4. The text is **automatically appended to today's notes file** (no Ctrl+V needed)
 
 ## Hotkeys summary
 
 | Key                     | Mode | Result |
 |-------------------------|------|--------|
-| Right Alt               | Clipboard | Transcribed text → clipboard (paste with Ctrl+V) |
-| Right Alt + Right Shift | Notes | Transcribed text → today's notes file |
+| Caps Lock               | Clipboard | Transcribed text → clipboard (paste with Ctrl+V) |
+| Caps Lock + Left Shift  | Notes | Transcribed text → today's notes file |
 
 ---
 
@@ -131,7 +131,7 @@ python main.py
 ```
 
 A microphone icon appears in the system tray (bottom-right corner of the taskbar).
-The hotkeys are now live — you can press Right Alt at any time.
+The hotkeys are now live — you can press Caps Lock at any time.
 
 On first launch, the app registers itself to **start automatically on Windows login**,
 so you won't need to run this command again after restarting your computer.
@@ -227,7 +227,7 @@ Run with the debug flag to see what key names your keyboard reports:
 ```bash
 python main.py --debug
 ```
-Then press Right Alt and check what name appears in the console.
+Then press Caps Lock and check what name appears in the console.
 
 ---
 
