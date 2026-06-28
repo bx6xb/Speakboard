@@ -19,10 +19,10 @@ entirely by hotkeys. No window, no cloud. Transcribes via local faster-whisper m
 
 ```
 IDLE
-  → [Caps Lock↓ + Left Shift state snapshotted] → Caps Lock↑
+  → [Right Alt↓ + Right Shift state snapshotted] → Right Alt↑
        ├─ shift was held → RECORDING_NOTES
        └─ no shift      → RECORDING_PASTE
-            ↓ Caps Lock↑ again
+            ↓ Right Alt↑ again
        PROCESSING
             ↓ transcription done
        IDLE
@@ -33,8 +33,9 @@ State is protected by `_state_lock`. Recording and processing run in daemon thre
 ## Hotkey implementation (critical quirk)
 
 - Uses `keyboard.hook()` (low-level Windows hook, needs admin for some apps)
-- Caps Lock is reported as `"caps lock"` on Windows (`CAPS_LOCK_NAMES` in `main.py`).
-- Left Shift is tracked **inside the hook** as its own key event (not via `is_pressed()`
+- Right Alt on non-US keyboards = AltGr → reported as `"altgr"` not `"right alt"`.
+  `RALT_NAMES = {"right alt", "altgr", "alt gr", "right menu"}` covers all variants.
+- Right Shift is tracked **inside the hook** as its own key event (not via `is_pressed()`
   at KEY_UP time). This handles all press-order combinations reliably.
 - Run with `--debug` flag to print all key names/scan codes to console.
 
